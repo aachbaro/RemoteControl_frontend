@@ -358,3 +358,265 @@ git commit -m "init: react + vite frontend setup"
 * Structure `src/api/` prête
 * Premier commit propre
 
+
+## Branchement du backend Django — Frontend React (Vite)
+
+Cette section connecte le frontend React au backend Django via le proxy Vite, pour piloter des actions serveur depuis une interface web (PC ou téléphone).
+
+---
+
+### Objectifs
+
+* Valider la communication frontend ↔ backend
+* Éviter les problèmes CORS en développement
+* Afficher l’état serveur et déclencher `start/stop`
+* Poser une architecture frontend propre (client + API métier)
+
+---
+
+### 0. Pré-requis
+
+Backend Django opérationnel et accessible sur le réseau.
+
+Endpoints :
+
+* `GET  /api/record/status/`
+* `POST /api/record/start/`
+* `POST /api/record/stop/`
+
+Lancement réseau :
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
+---
+
+### 1. Autoriser l’accès réseau côté Django
+
+En développement, Django refuse les hosts non autorisés (erreur `DisallowedHost`).
+
+Dans `backend/settings/dev.py` :
+
+```python
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "192.168.1.42",  # IP locale du PC
+]
+```
+
+Alternative simple en dev :
+
+```python
+ALLOWED_HOSTS = ["*"]
+```
+
+Redémarrer Django après modification.
+
+---
+
+### 2. Principe de communication frontend → backend
+
+Le navigateur appelle toujours `/api/*` sur le serveur Vite.
+
+```text
+React        →  /api/record/status/
+Vite proxy   →  http://IP:8000/api/record/status/
+Django       →  JSON
+```
+
+---
+
+### 3. Client HTTP centralisé
+
+Encapsuler `fetch` pour centraliser JSON + gestion d’erreurs.
+
+Dans `src/api/client.ts` :
+
+```ts
+export async function apiFetch<T>(
+  url: string,
+  options?: RequestInit
+): Promise<T> {
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    ...options,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`API error ${response.status}: ${text}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+```
+
+---
+
+### 4. API métier `recording`
+
+Encapsuler les routes backend dans une interface stable.
+
+Dans `src/api/recording.ts` :
+
+```ts
+import { apiFetch } from "./client";
+
+export type RecordingStatus = {
+  is_recording: boolean;
+  started_at: string | null;
+};
+
+export function getRecordingStatus() {
+  return apiFetch<RecordingStatus>("/api/record/status/");
+}
+
+export function startRecording() {
+  return apiFetch<RecordingStatus>("/api/record/start/", {
+    method: "POST",
+  });
+}
+
+export function stopRecording() {
+  return apiFetch<RecordingStatus>("/api/record/stop/", {
+    method: "POST",
+  });
+}
+```
+
+---
+
+### 5. Intégration dans l’UI React
+
+Charger l’état au démarrage, afficher l’état courant, gérer start/stop, gérer erreurs et chargement.
+
+Dans `src/App.tsx` :
+
+```tsx
+import { useEffect, useState } from "react";
+import {
+  getRecordingStatus,
+  startRecording,
+  stopRecording,
+  type RecordingStatus,
+} from "./api/recording";
+
+function App() {
+  const [status, setStatus] = useState<RecordingStatus | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refreshStatus() {
+    try {
+      setError(null);
+      const data = await getRecordingStatus();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  async function handleStart() {
+    try {
+      setLoading(true);
+      const data = await startRecording();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleStop() {
+    try {
+      setLoading(true);
+      const data = await stopRecording();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    refreshStatus();
+  }, []);
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>RemoteControl Frontend</h1>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {status ? (
+        <>
+          <p>
+            <strong>Status :</strong>{" "}
+            {status.is_recording ? "Recording" : "Stopped"}
+          </p>
+          <p>
+            <strong>Started at :</strong>{" "}
+            {status.started_at ?? "—"}
+          </p>
+        </>
+      ) : (
+        <p>Loading…</p>
+      )}
+
+      <div style={{ marginTop: "1rem" }}>
+        <button onClick={handleStart} disabled={loading}>
+          Start
+        </button>
+        <button onClick={handleStop} disabled={loading}>
+          Stop
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+```
+
+---
+
+### 6. Vérification finale (checklist)
+
+* Frontend accessible : `http://<IP_DU_PC>:5173`
+* `status` affiché au chargement
+* `Start` déclenche un `POST` backend
+* `Stop` déclenche un `POST` backend
+* Pas d’erreur CORS
+* Pas d’erreur `DisallowedHost`
+
+---
+
+### 7. Problèmes courants
+
+* `DisallowedHost` → ajouter l’IP du PC dans `ALLOWED_HOSTS`
+* `does not provide an export named` → exporter les types TypeScript (`export type ...`)
+* `Failed to fetch` → backend non lancé ou proxy mal configuré
+
+---
+
+### 8. Commit recommandé
+
+```bash
+git add src/api src/App.tsx
+git commit -m "feat: connect react frontend to django backend"
+```
+
+---
+
+### Résultat
+
+* Chaîne complète téléphone → React → Django
+* Frontend réutilisable comme template
+* Base saine pour piloter SampleRod
+
