@@ -1,55 +1,11 @@
-// remotecontrol-frontend/src/App.tsx
-
-import { useEffect, useState } from "react";
-import {
-  getRecordingStatus,
-  startRecording,
-  stopRecording,
-  type RecordingStatus,
-} from "./api/recording";
+import { RecordingPanel } from "./components/RecordingPanel";
+import { ScreenshotPanel } from "./components/ScreenshotPanel";
+import { useRecording } from "./hooks/useRecording";
+import { useScreenshot } from "./hooks/useScreenshot";
 
 function App() {
-  const [status, setStatus] = useState<RecordingStatus | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function refreshStatus() {
-    try {
-      setError(null);
-      const data = await getRecordingStatus();
-      setStatus(data);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  }
-
-  async function handleStart() {
-    try {
-      setLoading(true);
-      const data = await startRecording();
-      setStatus(data);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleStop() {
-    try {
-      setLoading(true);
-      const data = await stopRecording();
-      setStatus(data);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    refreshStatus();
-  }, []);
+  const { status, loading, error, start, stop } = useRecording();
+  const screenshot = useScreenshot();
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -57,32 +13,19 @@ function App() {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {status ? (
-        <div>
-          <p>
-            <strong>Status :</strong>{" "}
-            {status.is_recording ? "Recording" : "Stopped"}
-          </p>
-          <p>
-            <strong>Started at :</strong> {status.started_at ?? "—"}
-          </p>
-        </div>
-      ) : (
-        <p>Loading status…</p>
-      )}
+      <RecordingPanel
+        status={status}
+        loading={loading}
+        onStart={start}
+        onStop={stop}
+      />
 
-      <div style={{ marginTop: "1rem" }}>
-        <button onClick={handleStart} disabled={loading}>
-          Start
-        </button>
-        <button
-          onClick={handleStop}
-          disabled={loading}
-          style={{ marginLeft: "1rem" }}
-        >
-          Stop
-        </button>
-      </div>
+      <ScreenshotPanel
+        loading={screenshot.loading}
+        message={screenshot.message}
+        error={screenshot.error}
+        onCapture={screenshot.capture}
+      />
     </div>
   );
 }

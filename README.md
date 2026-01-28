@@ -8,9 +8,9 @@ Ce projet fournit une télécommande web minimaliste permettant de déclencher d
 
 Le cas d’usage initial est le pilotage à distance de SampleRod :
 
-* démarrer un enregistrement
-* arrêter un enregistrement
-* consulter l’état courant
+- démarrer un enregistrement
+- arrêter un enregistrement
+- consulter l’état courant
 
 Le frontend est conçu pour être accessible depuis un navigateur mobile et connecté à un backend sur le même réseau Wi-Fi.
 
@@ -18,10 +18,10 @@ Le frontend est conçu pour être accessible depuis un navigateur mobile et conn
 
 Ce repository sert de base de référence pour :
 
-* apprendre les fondamentaux de React
-* comprendre la communication frontend ↔ backend
-* documenter un setup reproductible
-* construire un frontend modulaire et configurable
+- apprendre les fondamentaux de React
+- comprendre la communication frontend ↔ backend
+- documenter un setup reproductible
+- construire un frontend modulaire et configurable
 
 L’objectif n’est pas un produit fini, mais un template réutilisable.
 
@@ -43,10 +43,10 @@ L’objectif n’est pas un produit fini, mais un template réutilisable.
 
 ## Principes clés
 
-* Le frontend ne connaît jamais directement l’IP du backend
-* Toutes les requêtes passent par `/api/*`
-* Le proxy Vite redirige vers le backend
-* Aucun CORS nécessaire en développement
+- Le frontend ne connaît jamais directement l’IP du backend
+- Toutes les requêtes passent par `/api/*`
+- Le proxy Vite redirige vers le backend
+- Aucun CORS nécessaire en développement
 
 ## Structure du repository
 
@@ -85,21 +85,21 @@ VITE_BACKEND_TARGET=http://<IP_DU_PC>:8000
 
 ## Proxy Vite (principe)
 
-* Le frontend effectue des requêtes vers `/api/...`
-* Vite intercepte `/api` et redirige vers le backend
+- Le frontend effectue des requêtes vers `/api/...`
+- Vite intercepte `/api` et redirige vers le backend
 
 Avantages :
 
-* code frontend indépendant de l’URL backend
-* pas de CORS en développement
-* transition simple vers un build production
+- code frontend indépendant de l’URL backend
+- pas de CORS en développement
+- transition simple vers un build production
 
 ## Lancement en mode téléphone
 
 Le serveur de développement doit écouter sur toutes les interfaces réseau.
 
-* host : `0.0.0.0`
-* port : `5173`
+- host : `0.0.0.0`
+- port : `5173`
 
 Accès depuis le réseau local :
 
@@ -117,10 +117,10 @@ Cette section décrit la mise en place d’un frontend React minimal, propre, ac
 
 ### Objectif de l’étape
 
-* Poser un socle React sain
-* Comprendre l’emplacement des fichiers clés
-* Éviter les erreurs classiques (root projet, `.env`, proxy)
-* Obtenir un frontend lisible et réutilisable
+- Poser un socle React sain
+- Comprendre l’emplacement des fichiers clés
+- Éviter les erreurs classiques (root projet, `.env`, proxy)
+- Obtenir un frontend lisible et réutilisable
 
 ---
 
@@ -145,9 +145,9 @@ remotecontrol-frontend/
 
 ### 1. Pré-requis
 
-* Node.js ≥ 18
-* npm
-* Terminal ouvert dans le dossier parent
+- Node.js ≥ 18
+- npm
+- Terminal ouvert dans le dossier parent
 
 Vérification :
 
@@ -168,8 +168,8 @@ npm create vite@latest remotecontrol-frontend
 
 Choix :
 
-* Framework : React
-* Variant : TypeScript
+- Framework : React
+- Variant : TypeScript
 
 Installation des dépendances :
 
@@ -350,14 +350,13 @@ git commit -m "init: react + vite frontend setup"
 
 ### 10. État attendu
 
-* React accessible depuis le téléphone
-* Proxy `/api` fonctionnel
-* `.env.example` présent
-* `.env.local` ignoré par Git
-* Projet nettoyé
-* Structure `src/api/` prête
-* Premier commit propre
-
+- React accessible depuis le téléphone
+- Proxy `/api` fonctionnel
+- `.env.example` présent
+- `.env.local` ignoré par Git
+- Projet nettoyé
+- Structure `src/api/` prête
+- Premier commit propre
 
 ## Branchement du backend Django — Frontend React (Vite)
 
@@ -367,10 +366,10 @@ Cette section connecte le frontend React au backend Django via le proxy Vite, po
 
 ### Objectifs
 
-* Valider la communication frontend ↔ backend
-* Éviter les problèmes CORS en développement
-* Afficher l’état serveur et déclencher `start/stop`
-* Poser une architecture frontend propre (client + API métier)
+- Valider la communication frontend ↔ backend
+- Éviter les problèmes CORS en développement
+- Afficher l’état serveur et déclencher `start/stop`
+- Poser une architecture frontend propre (client + API métier)
 
 ---
 
@@ -380,9 +379,9 @@ Backend Django opérationnel et accessible sur le réseau.
 
 Endpoints :
 
-* `GET  /api/record/status/`
-* `POST /api/record/start/`
-* `POST /api/record/stop/`
+- `GET  /api/record/status/`
+- `POST /api/record/start/`
+- `POST /api/record/stop/`
 
 Lancement réseau :
 
@@ -437,7 +436,7 @@ Dans `src/api/client.ts` :
 ```ts
 export async function apiFetch<T>(
   url: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const response = await fetch(url, {
     headers: {
@@ -561,8 +560,7 @@ function App() {
             {status.is_recording ? "Recording" : "Stopped"}
           </p>
           <p>
-            <strong>Started at :</strong>{" "}
-            {status.started_at ?? "—"}
+            <strong>Started at :</strong> {status.started_at ?? "—"}
           </p>
         </>
       ) : (
@@ -588,20 +586,20 @@ export default App;
 
 ### 6. Vérification finale (checklist)
 
-* Frontend accessible : `http://<IP_DU_PC>:5173`
-* `status` affiché au chargement
-* `Start` déclenche un `POST` backend
-* `Stop` déclenche un `POST` backend
-* Pas d’erreur CORS
-* Pas d’erreur `DisallowedHost`
+- Frontend accessible : `http://<IP_DU_PC>:5173`
+- `status` affiché au chargement
+- `Start` déclenche un `POST` backend
+- `Stop` déclenche un `POST` backend
+- Pas d’erreur CORS
+- Pas d’erreur `DisallowedHost`
 
 ---
 
 ### 7. Problèmes courants
 
-* `DisallowedHost` → ajouter l’IP du PC dans `ALLOWED_HOSTS`
-* `does not provide an export named` → exporter les types TypeScript (`export type ...`)
-* `Failed to fetch` → backend non lancé ou proxy mal configuré
+- `DisallowedHost` → ajouter l’IP du PC dans `ALLOWED_HOSTS`
+- `does not provide an export named` → exporter les types TypeScript (`export type ...`)
+- `Failed to fetch` → backend non lancé ou proxy mal configuré
 
 ---
 
@@ -616,7 +614,317 @@ git commit -m "feat: connect react frontend to django backend"
 
 ### Résultat
 
-* Chaîne complète téléphone → React → Django
-* Frontend réutilisable comme template
-* Base saine pour piloter SampleRod
+- Chaîne complète téléphone → React → Django
+- Frontend réutilisable comme template
+- Base saine pour piloter SampleRod
 
+## Structuration du frontend — Hooks & Composants
+
+Cette étape transforme un frontend fonctionnel mais monolithique en une architecture claire, maintenable et extensible.
+
+---
+
+### Objectifs
+
+- Éviter un `App.tsx` surchargé
+- Isoler la logique asynchrone (API, états, erreurs)
+- Faciliter l’ajout de nouvelles actions (ex : screenshot)
+- Obtenir une arborescence stable et lisible
+
+---
+
+### Principe général
+
+Un composant React ne contient pas de logique métier complexe.
+
+Règle appliquée :
+
+- appels API → `src/api/`
+- logique + états → `src/hooks/`
+- affichage → `src/components/`
+- assemblage → `App.tsx`
+
+---
+
+### Arborescence cible
+
+```text
+src/
+├── api/
+│   ├── client.ts
+│   ├── recording.ts
+│   └── screen.ts
+│
+├── hooks/
+│   ├── useRecording.ts
+│   └── useScreenshot.ts
+│
+├── components/
+│   ├── RecordingPanel.tsx
+│   └── ScreenshotPanel.tsx
+│
+├── App.tsx
+└── main.tsx
+```
+
+---
+
+### 1. Extraire la logique `recording` dans un hook
+
+La logique d’enregistrement est déplacée dans un hook dédié.
+
+Créer `src/hooks/useRecording.ts` :
+
+```ts
+import { useCallback, useEffect, useState } from "react";
+import {
+  getRecordingStatus,
+  startRecording,
+  stopRecording,
+  type RecordingStatus,
+} from "../api/recording";
+
+export function useRecording() {
+  const [status, setStatus] = useState<RecordingStatus | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await getRecordingStatus();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }, []);
+
+  const start = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await startRecording();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const stop = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await stopRecording();
+      setStatus(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { status, loading, error, start, stop };
+}
+```
+
+---
+
+### 2. Créer le composant `RecordingPanel`
+
+Le composant est purement visuel.
+
+Créer `src/components/RecordingPanel.tsx` :
+
+```tsx
+import type { RecordingStatus } from "../api/recording";
+
+type Props = {
+  status: RecordingStatus | null;
+  loading: boolean;
+  onStart: () => void;
+  onStop: () => void;
+};
+
+export function RecordingPanel({ status, loading, onStart, onStop }: Props) {
+  return (
+    <div>
+      {status ? (
+        <>
+          <p>
+            <strong>Status :</strong>{" "}
+            {status.is_recording ? "Recording" : "Stopped"}
+          </p>
+          <p>
+            <strong>Started at :</strong> {status.started_at ?? "—"}
+          </p>
+        </>
+      ) : (
+        <p>Loading status…</p>
+      )}
+
+      <div style={{ marginTop: "1rem" }}>
+        <button onClick={onStart} disabled={loading}>
+          Start
+        </button>
+        <button onClick={onStop} disabled={loading}>
+          Stop
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+### 3. Ajouter l’API `screenshot`
+
+Chaque domaine fonctionnel possède son module API.
+
+Créer `src/api/screen.ts` :
+
+```ts
+import { apiFetch } from "./client";
+
+export type ScreenCaptureResponse = {
+  ok: boolean;
+  path?: string;
+};
+
+export function captureScreen() {
+  return apiFetch<ScreenCaptureResponse>("/api/screen/capture/", {
+    method: "POST",
+  });
+}
+```
+
+---
+
+### 4. Créer le hook `useScreenshot`
+
+La logique screenshot est isolée.
+
+Créer `src/hooks/useScreenshot.ts` :
+
+```ts
+import { useCallback, useState } from "react";
+import { captureScreen } from "../api/screen";
+
+export function useScreenshot() {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const capture = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setMessage(null);
+
+      const res = await captureScreen();
+      setMessage(res.ok ? "Screenshot capturé ✅" : "Échec screenshot ❌");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { loading, message, error, capture };
+}
+```
+
+---
+
+### 5. Créer le composant `ScreenshotPanel`
+
+Créer `src/components/ScreenshotPanel.tsx` :
+
+```tsx
+type Props = {
+  loading: boolean;
+  message: string | null;
+  error: string | null;
+  onCapture: () => void;
+};
+
+export function ScreenshotPanel({ loading, message, error, onCapture }: Props) {
+  return (
+    <div style={{ marginTop: "2rem" }}>
+      <button onClick={onCapture} disabled={loading}>
+        {loading ? "Screenshot..." : "Screenshot"}
+      </button>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p>{message}</p>}
+    </div>
+  );
+}
+```
+
+---
+
+### 6. `App.tsx` devient un assembleur
+
+`App.tsx` assemble les briques sans logique métier.
+
+```tsx
+import { RecordingPanel } from "./components/RecordingPanel";
+import { ScreenshotPanel } from "./components/ScreenshotPanel";
+import { useRecording } from "./hooks/useRecording";
+import { useScreenshot } from "./hooks/useScreenshot";
+
+function App() {
+  const recording = useRecording();
+  const screenshot = useScreenshot();
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>RemoteControl Frontend</h1>
+
+      {recording.error && <p style={{ color: "red" }}>{recording.error}</p>}
+
+      <RecordingPanel
+        status={recording.status}
+        loading={recording.loading}
+        onStart={recording.start}
+        onStop={recording.stop}
+      />
+
+      <ScreenshotPanel
+        loading={screenshot.loading}
+        message={screenshot.message}
+        error={screenshot.error}
+        onCapture={screenshot.capture}
+      />
+    </div>
+  );
+}
+
+export default App;
+```
+
+---
+
+### Résultat architectural
+
+- `App.tsx` court et lisible
+- Logique encapsulée par fonctionnalité
+- Ajout d’une action suivant toujours le même pattern
+
+---
+
+### Pattern réutilisable (règle d’or)
+
+Pour toute nouvelle action backend :
+
+- créer un module API (`src/api/x.ts`)
+- créer un hook (`src/hooks/useX.ts`)
+- créer un panel UI (`src/components/XPanel.tsx`)
+- assembler dans `App.tsx`
